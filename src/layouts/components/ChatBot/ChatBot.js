@@ -10,12 +10,16 @@ import { AiFillFacebook, AiOutlineSend } from 'react-icons/ai';
 import config from '~/config';
 import { socket } from '~/socket';
 import chatApi from '~/api/chat/chatApi';
+import images from '~/assets/img';
 
 const cx = classNames.bind(styles);
 function ChatBot() {
     const userState = useSelector((state) => state.auth);
     const [toggle, setToggle] = useState(false);
+    const [time, setTime] = useState(1);
     const [formShow, setFormShow] = useState('login');
+    const [typingStatus, setTypingStatus] = useState('');
+
     const [formValue, setFormValue] = useState({
         username: '',
         email: '',
@@ -23,9 +27,24 @@ function ChatBot() {
     });
 
     useEffect(() => {
+        socket.on('typingResponse', (data) => setTypingStatus(data));
+        return () => {
+            socket.off('typingResponse', (data) => setTypingStatus(data));
+        };
+    }, [socket]);
+
+    useEffect(() => {
+        socket.on('typingBlurResponse', (data) => setTypingStatus(data));
+        return () => {
+            socket.off('typingBlurResponse', (data) => setTypingStatus(data));
+        };
+    }, [socket]);
+
+    useEffect(() => {
         if (userState.user) {
             setFormShow('chat');
             socket.connect();
+            socket.emit('createAdmin', 'adminRoom');
         }
     }, [userState?.user]);
 
@@ -100,20 +119,22 @@ function ChatBot() {
     };
 
     const [chatMess, setChatMess] = useState('');
+    const [data, setData] = useState([]);
 
     const onSubmit = async (event) => {
         event.preventDefault();
-        setData((pre) => [
-            ...pre,
+        if (chatMess.trim().length === 0) return;
+        setData([
+            ...data,
             {
-                username: userState.user.username,
+                username: 'admin',
                 message: chatMess,
             },
         ]);
         try {
             if (userState?.user) {
-                await socket.emit('userChat', {
-                    username: userState.user.username,
+                await socket.emit('adminChat', {
+                    username: 'son',
                     message: chatMess,
                 });
                 setChatMess('');
@@ -126,30 +147,61 @@ function ChatBot() {
         }
     };
 
-    const [data, setData] = useState([]);
+    const handleTyping = (event) => {
+        socket.emit('typing', `${userState?.user?.username} is typing`);
+        if (event.key === 'Enter') {
+            onSubmit(event);
+        }
+    };
+
+    const handleTypingBlur = () => {
+        socket.emit('typingBlur', '');
+    };
 
     useEffect(() => {
         if (userState.user) {
-            chatApi.getChat(userState.user.username).then((res) => {
+            chatApi.getChat('son').then((res) => {
                 setData(res.chat.content);
             });
         }
         // eslint-disable-next-line
     }, [userState?.user]);
 
-    const chatRef = useRef();
+    const scroll = useRef();
+
     useEffect(() => {
         socket.on('serverChatMess', (mess) => {
-            chatRef.current.scrollIntoView({
-                behavior: 'smooth',
-                block: 'end',
-            });
+            setData([...data, mess]);
         });
         return () => {
             socket.off('serverChatMess');
         };
         // eslint-disable-next-line
-    }, [socket]);
+    }, [socket, data]);
+
+    useEffect(() => {
+        scroll.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'end',
+        });
+        // eslint-disable-next-line
+    }, [data]);
+
+    useEffect(() => {
+        if (time === 2) {
+            scroll?.current.scrollIntoView({
+                behavior: 'auto',
+                block: 'end',
+            });
+        }
+    }, [time]);
+
+    useEffect(() => {
+        scroll?.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'end',
+        });
+    }, [typingStatus]);
 
     const [focusInput, setFocusInput] = useState(false);
     const inputRef = useRef();
@@ -157,12 +209,14 @@ function ChatBot() {
     return (
         <div className={cx('wrapper')}>
             <div
-                style={{ backgroundImage: 'url(https://chat.zozo.vn/resource/widget.svg)' }}
                 className={cx('icon', toggle && 'hidden')}
                 onClick={() => {
                     setToggle((pre) => !pre);
+                    setTime((pre) => pre + 1);
                 }}
-            />
+            >
+                <img alt="" className={cx('chat-image')} src={images.chatImage}></img>
+            </div>
             <div className={cx('content', toggle && 'show', formShow === 'chat' && 'chat')}>
                 <div className={cx('header')}>
                     {formShow === 'login' ? (
@@ -209,6 +263,7 @@ function ChatBot() {
                                     autoComplete="off"
                                     onFocus={onFocus}
                                     onBlur={onBlur}
+                                    onKeyDown={(event) => handleTyping(event)}
                                     value={formValue.username}
                                     onChange={onChangeFormValue}
                                     placeholder="Họ và tên"
@@ -269,8 +324,8 @@ function ChatBot() {
                     <div className={cx('chat-contain')}>
                         <div className={cx('chat-contain-wrapper')}>
                             {data.map((mess, index) =>
-                                mess.username === 'son' ? (
-                                    <li key={index} className={cx('chat-user')} ref={chatRef}>
+                                mess.username === 'admin' ? (
+                                    <li key={index} className={cx('chat-user')}>
                                         {mess.message}
                                     </li>
                                 ) : (
@@ -279,6 +334,14 @@ function ChatBot() {
                                     </li>
                                 ),
                             )}
+                            {typingStatus !== '' && (
+                                <div className={cx('typing')}>
+                                    <div className={cx('typing__dot')}></div>
+                                    <div className={cx('typing__dot')}></div>
+                                    <div className={cx('typing__dot')}></div>
+                                </div>
+                            )}
+                            <span ref={scroll}></span>
                         </div>
                     </div>
                     <div className={cx('input-group')}>
@@ -286,7 +349,11 @@ function ChatBot() {
                             ref={inputRef}
                             spellCheck={false}
                             onFocus={() => setFocusInput(true)}
-                            onBlur={() => setFocusInput(false)}
+                            onBlur={() => {
+                                handleTypingBlur();
+                                setFocusInput(false);
+                            }}
+                            onKeyDown={(event) => handleTyping(event)}
                             contentEditable={true}
                             className={cx('chat-input')}
                             onInput={(event) => {
@@ -296,7 +363,11 @@ function ChatBot() {
                         {!focusInput && chatMess.length === 0 && <div className={cx('chat-input-lable')}>Aa</div>}
 
                         <div className={cx('input-icon')} onClick={onSubmit}>
-                            <AiOutlineSend />
+                            {chatMess?.trim().length === 0 ? (
+                                <AiOutlineSend className={cx('input-icon-send')} />
+                            ) : (
+                                <AiOutlineSend />
+                            )}
                         </div>
                     </div>
                 </div>

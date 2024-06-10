@@ -13,6 +13,16 @@
     border-radius: 50%;
     animation: belleffect 2s linear infinite;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chat-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .icon.hidden {
@@ -35,7 +45,7 @@
     width: 280px;
     height: 360px;
     background-color: var(--white-color);
-    border-radius: 4px;
+    border-radius: 8px;
     box-shadow: 2px 2px 8px 8px rgba(30, 144, 255, 0.2);
     display: none;
 }
@@ -220,10 +230,15 @@
     height: 33px;
 }
 
+.input-icon-send {
+    color: var(--light-color);
+}
+
 .chat-input {
     width: 85%;
     background-color: rgba(0, 0, 0, 0.05);
     border-radius: 12px;
+    border: 1px solid var(--border-color);
     padding: 4px 12px;
     outline: none;
     &:focus {
@@ -259,7 +274,7 @@
     display: flex;
     flex-direction: column;
     flex: 1;
-    padding: 12px;
+    padding: 0 12px 12px 12px;
     overflow: hidden;
 }
 
@@ -272,10 +287,10 @@
 }
 
 .chat-user {
-    padding-left: 12px;
-    padding-right: 12px;
-    border-radius: 4px;
+    padding: 8px 12px;
+    border-radius: 16px;
     align-self: flex-start;
+    line-height: 2rem;
     font-weight: 400;
     font-size: 1.4rem;
     color: var(--text-color);
@@ -289,12 +304,59 @@
 .chat-admin {
     padding-left: 12px;
     padding-right: 12px;
-    border-radius: 4px;
     align-self: flex-end;
+    padding: 8px 12px;
+    border-radius: 16px;
+    line-height: 2rem;
     font-weight: 400;
     font-size: 1.4rem;
     color: var(--text-color);
     list-style: none;
     background-color: rgba(0, 0, 0, 0.05);
     margin-bottom: 8px;
+    margin-right: 4px;
+    max-width: 100%;
+    word-wrap: break-word;
+}
+
+// typing
+.typing {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px;
+}
+
+.typing__dot {
+    width: 4px;
+    height: 4px;
+    margin: 0 4px;
+    background: #8d8c91;
+    border-radius: 50%;
+    opacity: 0;
+    animation: loadingFade 1s infinite;
+}
+
+.typing__dot:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.typing__dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing__dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes loadingFade {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0.8;
+    }
+    100% {
+        opacity: 0;
+    }
 }

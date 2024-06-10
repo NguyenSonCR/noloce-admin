@@ -1,0 +1,65 @@
+.wrapper {
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    justify-content: space-between;
+    &:hover {
+        background-color: var(--background-color);
+        cursor: pointer;
+    }
+    border-radius: 8px;
+}
+
+.wrapper.active {
+    background-color: var(--background-active);
+}
+
+.avatar {
+    position: relative;
+    width: 68px;
+    height: 68px;
+    padding: 6px;
+}
+
+.img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
+.content {
+    padding: 6px;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.name {
+    font-weight: 500;
+    font-size: 1.6rem;
+    color: var(--text-color);
+    line-height: 2.2rem;
+    padding-bottom: 8px;
+}
+
+.message {
+    font-weight: 400;
+    font-size: 1.4rem;
+    color: var(--text-color);
+    line-height: 2rem;
+}
+
+.message.notRead {
+    font-weight: 500;
+    color: var(--text-color-bold);
+}
+
+.notify-img {
+    padding: 6px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+}

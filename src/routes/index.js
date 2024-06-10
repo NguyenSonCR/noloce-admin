@@ -7,23 +7,25 @@ import Login from '~/pages/Login';
 import Procedure from '~/pages/websites/Procedure';
 import Price from '~/pages/websites/Price';
 import Demo from '~/pages/websites/Demo';
+import Message from '~/pages/Message';
 
 const publicRoutes = [
+    { path: config.routes.register, component: Register, layout: null },
+    { path: config.routes.login, component: Login, layout: null },
+];
+
+const privateRoutes = [
     // general
     { path: config.routes.home, component: Website },
-
+    { path: config.routes.message, component: Message },
     // website
     { path: config.routes.website, component: Website },
     { path: config.routes.procedure, component: Procedure },
     { path: config.routes.price, component: Price },
     { path: config.routes.demo, component: Demo },
-];
 
-const privateRoutes = [];
-
-const nullLayoutRoutes = [
-    { path: config.routes.register, component: Register, layout: null },
-    { path: config.routes.login, component: Login, layout: null },
+    // search
     { path: config.routes.search, component: Search, layout: HeaderOnly },
 ];
-export { publicRoutes, privateRoutes, nullLayoutRoutes };
+
+export { publicRoutes, privateRoutes };

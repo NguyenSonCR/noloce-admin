@@ -1,3 +1,19 @@
+.header-title {
+    font-weight: 400;
+    font-size: 2.2rem;
+    line-height: 3cqmax;
+    color: var(--primary-color);
+    text-align: center;
+}
+
+.header-descreption {
+    font-weight: 400;
+    font-size: 1.6rem;
+    line-height: 2.6rem;
+    color: var(--primary-color);
+    text-align: center;
+}
+
 .container {
     padding: 12px;
 }
@@ -6,25 +22,35 @@
     padding: 0 12px;
 }
 
-.content p {
+.content-title {
     font-size: 1.6rem;
-    font-weight: 500;
-    color: var(--text-color);
+    font-weight: 400;
+    line-height: 2.6rem;
+    color: var(--primary-color);
+    padding: 4px 8px;
 }
 
 .content-list {
     margin: 0;
+    list-style-type: circle;
+    padding-left: 24px;
+}
+
+.content-item p {
+    padding: 4px 8px;
+    font-size: 1.6rem;
+    font-weight: 400;
+    line-height: 2.6rem;
+    color: var(--text-color);
 }
 
 .content-item {
-    font-size: 1.6rem;
-    font-weight: 400;
-    color: var(--text-color);
-    text-align: justify;
+    color: var(--primary-color);
 }
 
 .concept {
     padding: 24px 0;
+    margin: 0 !important;
 }
 
 .content-img {

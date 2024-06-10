@@ -120,7 +120,7 @@ function Register() {
                     setAuthToken(response.accessToken);
                     const res = await authApi.loadUser();
                     if (res.success) {
-                        dispatch(setAuth(res.user));
+                        dispatch(setAuth(res.admin));
                         navigate(routes.home);
                         dispatch(
                             addToast({

@@ -28,6 +28,12 @@ function Navigation() {
             code: 'demo',
             to: config.routes.demo,
         },
+
+        {
+            title: 'Message',
+            code: 'message',
+            to: config.routes.message,
+        },
     ];
 
     return (

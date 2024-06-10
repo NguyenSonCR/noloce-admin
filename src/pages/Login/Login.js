@@ -142,7 +142,7 @@ function Login() {
                 setAuthToken(response.accessToken);
                 const res = await authApi.loadUser();
                 if (res.success) {
-                    dispatch(setAuth({ user: res.user, isAuthenticated: true }));
+                    dispatch(setAuth({ user: res.admin, isAuthenticated: true }));
                     navigate(routes.home);
                     dispatch(
                         addToast({

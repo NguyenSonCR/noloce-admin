@@ -3,18 +3,18 @@ import axiosJWT from '../setAxios';
 import { LOCAL_STORAGE_TOKEN_NAME } from '../constants';
 const authApi = {
     login: (formData) => {
-        const url = '/users/login';
+        const url = '/admin/auth/login';
         return axiosJWT.post(url, formData);
     },
     register: (formData) => {
-        const url = '/users/register';
+        const url = '/admin/auth/register';
         return axiosJWT.post(url, formData);
     },
     loadUser: () => {
         if (localStorage[LOCAL_STORAGE_TOKEN_NAME]) {
             setAuthToken(localStorage[LOCAL_STORAGE_TOKEN_NAME]);
         }
-        const url = '/users';
+        const url = '/admin/auth';
         return axiosJWT.get(url);
     },
 };

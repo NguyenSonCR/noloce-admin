@@ -1,21 +1,45 @@
+.wrapper {
+    border-radius: 16px;
+    padding-bottom: 48px;
+}
+
 .header {
     padding: 24px;
 }
 
 .header-title {
-    font-size: 2rem;
+    font-size: 2.6rem;
+    line-height: 4rem;
     font-weight: 400;
     color: var(--primary-color);
     text-align: center;
 }
 
 .header-text {
-    font-size: 1.6rem;
+    font-size: 2.2rem;
+    line-height: 3rem;
     font-weight: 400;
-    color: var(--text-color);
+    color: var(--primary-color);
     text-align: center;
 }
 
+.descreption-header {
+    font-size: 2.2rem;
+    line-height: 3rem;
+    font-weight: 400;
+    color: var(--primary-color);
+    text-align: justify;
+    padding: 8px 4px;
+}
+
+.descreption-text {
+    font-size: 1.6rem;
+    line-height: 2.6rem;
+    font-weight: 400;
+    color: var(--primary-color);
+    text-align: justify;
+    padding: 8px 4px;
+}
 .content {
     display: flex;
     justify-content: space-between;
@@ -52,31 +76,177 @@
 }
 
 // slider
-.slider-container {
-    position: relative;
-}
 
 .mySwiper {
-    height: 160px;
+    height: 270px;
+    overflow: hidden;
+    overflow: hidden;
+    border-radius: 16px;
 }
 
 .slider-item {
+    background-color: rgb(248, 199, 185);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 16px;
+}
+
+.slider-lelf {
+    flex: 1 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.slider-right {
+    flex: 1 1;
+    justify-content: center;
+    display: flex;
+    height: 270px;
+    align-items: center;
 }
 
 .slider-img {
     width: 100%;
-    height: 160px;
-    object-fit: cover;
+    height: 220px;
+    object-fit: contain;
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 16px;
 }
 
 .slider-text {
     width: 80%;
     text-align: center;
-    position: absolute;
     color: var(--white-color);
-    z-index: 2;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    font-size: 2.6rem;
+    font-weight: 600;
+    line-height: 3rem;
     text-shadow: 1px 1px rgba($color: #000000, $alpha: 0.2);
+}
+
+.carousel {
+    position: relative;
+}
+
+.swiper-next-button {
+    position: absolute;
+    background-color: rgba(77, 46, 168, 0.3);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    margin-right: 14px;
+    cursor: pointer;
+    &:hover {
+        background-color: rgba(77, 46, 168, 0.4);
+    }
+}
+
+.swiper-pre-button {
+    position: absolute;
+    background-color: #4d2ea84d;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    margin-left: 14px;
+    cursor: pointer;
+    &:hover {
+        background-color: rgba(77, 46, 168, 0.4);
+    }
+}
+
+.swiper-button-icon {
+    color: var(--primary-color);
+    font-weight: 400;
+    font-size: 2rem;
+}
+
+// service
+.service {
+    margin-top: 24px;
+}
+
+.service_header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.service_header-header {
+    font-size: 2.2rem;
+    line-height: 3rem;
+    font-weight: 400;
+    color: var(--primary-color);
+    text-align: center;
+    padding: 8px 4px;
+}
+
+.service_header-des {
+    font-size: 1.6rem;
+    line-height: 2.6rem;
+    font-weight: 400;
+    color: var(--text-color);
+    text-align: center;
+}
+
+.service_container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 24px;
+}
+
+.service_col {
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+
+.service_content {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 24px;
+}
+
+.service_content-img {
+    width: 200px;
+    object-fit: contain;
+}
+
+.service_content-title {
+    font-weight: 400;
+    font-size: 2.2rem;
+    color: var(--primary-color);
+    padding: 12px;
+    margin: 12px 0;
+}
+
+.service_content-text {
+    font-size: 1.6rem;
+    line-height: 2.6rem;
+    font-weight: 400;
+    color: var(--text-color);
+    text-align: justify;
+    padding: 8px 4px;
+}
+
+// price
+.price {
+    margin-top: 36px;
 }

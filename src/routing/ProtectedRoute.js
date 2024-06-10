@@ -16,7 +16,7 @@ const ProtectedRoute = ({ children }) => {
                 .loadUser()
                 .then((data) => {
                     if (data.success) {
-                        dispatch(setAuth({ user: data.user, isAuthenticated: true }));
+                        dispatch(setAuth({ user: data.admin, isAuthenticated: true }));
                     }
                 })
                 .catch((error) => {
