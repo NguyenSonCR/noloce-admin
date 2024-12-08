@@ -10,8 +10,9 @@ import { LOCAL_STORAGE_TOKEN_NAME } from '~/api/constants';
 const ProtectedRoute = ({ children }) => {
     const authState = useSelector((state) => state.auth);
     const dispatch = useDispatch();
+
     useEffect(() => {
-        if (!authState.user) {
+        if (!authState.isAuthenticated) {
             authApi
                 .loadUser()
                 .then((data) => {

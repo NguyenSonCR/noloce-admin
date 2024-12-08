@@ -15,6 +15,7 @@ import { LOCAL_STORAGE_TOKEN_NAME } from '~/api/constants';
 import useViewport from '~/hooks/useViewport';
 import { BsChevronLeft } from 'react-icons/bs';
 import { useLocation } from 'react-router-dom';
+import { socket } from '~/socket';
 
 const cx = classNames.bind(styles);
 function Header() {
@@ -22,6 +23,8 @@ function Header() {
     const isMobile = viewPort.width < 740;
     const { pathname } = useLocation();
     const navigate = useNavigate();
+    const authState = useSelector((state) => state.auth);
+
     const userMenu = [
         {
             icon: <FontAwesomeIcon icon={faUser} />,
@@ -39,22 +42,24 @@ function Header() {
 
     const dispatch = useDispatch();
     useEffect(() => {
-        authApi
-            .loadUser()
-            .then((data) => {
-                if (data.success) {
-                    dispatch(setAuth({ user: data.admin, isAuthenticated: true }));
-                }
-            })
-            .catch((error) => {
-                console.log(error);
-                localStorage.removeItem(LOCAL_STORAGE_TOKEN_NAME);
-                dispatch(setAuth({ user: null, isAuthenticated: false }));
-            });
+        if (!authState.isAuthenticated) {
+            authApi
+                .loadUser()
+                .then((data) => {
+                    if (data.success) {
+                        dispatch(setAuth({ user: data.admin, isAuthenticated: true }));
+                        socket.connect();
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                    localStorage.removeItem(LOCAL_STORAGE_TOKEN_NAME);
+                    dispatch(setAuth({ user: null, isAuthenticated: false }));
+                });
+        }
+
         // eslint-disable-next-line
     }, []);
-
-    const userState = useSelector((state) => state.auth);
 
     let body = null;
     if (isMobile) {
@@ -74,11 +79,11 @@ function Header() {
                                 </div>
                                 <div className={cx('action')}>
                                     <div className={cx('notify')}></div>
-                                    {userState.isAuthenticated ? (
+                                    {authState.isAuthenticated ? (
                                         <Menu items={userMenu}>
                                             <div className={cx('user')}>
                                                 <img src={images.avatar} alt="user" className={cx('user-img')}></img>
-                                                <span className={cx('user-name')}>{userState.user.username}</span>
+                                                <span className={cx('user-name')}>{authState.user.username}</span>
                                             </div>
                                         </Menu>
                                     ) : (
@@ -121,19 +126,19 @@ function Header() {
                     </div>
                     <div className={cx('action')}>
                         <div className={cx('notify')}></div>
-                        {userState.isAuthenticated ? (
+                        {authState.isAuthenticated ? (
                             <Menu items={userMenu} offset={[0, 0]}>
                                 <div className={cx('user')}>
-                                    {userState.user.img ? (
-                                        <img src={userState.user.img} alt="user" className={cx('user-img')}></img>
+                                    {authState.user.img ? (
+                                        <img src={authState.user.img} alt="user" className={cx('user-img')}></img>
                                     ) : (
                                         <div className={cx('user-img-clone')}>
                                             <span className={cx('user-text')}>
-                                                {userState.user.username.slice(0, 1).toUpperCase()}
+                                                {authState.user.username.slice(0, 1).toUpperCase()}
                                             </span>
                                         </div>
                                     )}
-                                    <span className={cx('user-name')}>{userState.user.username}</span>
+                                    <span className={cx('user-name')}>{authState.user.username}</span>
                                 </div>
                             </Menu>
                         ) : (

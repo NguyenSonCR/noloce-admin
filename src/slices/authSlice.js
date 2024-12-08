@@ -4,7 +4,6 @@ const initialState = {
     user: null,
     isAuthenticated: false,
     isLoading: true,
-    library: [],
 };
 
 export const authSlice = createSlice({
@@ -21,21 +20,9 @@ export const authSlice = createSlice({
             state.isAuthenticated = false;
             state.isLoading = false;
         },
-        addSongLibrary: (state, action) => {
-            const newLibrary = [...state.library, action.payload];
-            state.library = newLibrary;
-        },
-        setLibrary: (state, action) => {
-            state.library = action.payload;
-        },
-
-        removeSongLibrary: (state, action) => {
-            const newLibrary = state.library.filter((item) => item.encodeId !== action.payload);
-            state.library = newLibrary;
-        },
     },
 });
 
-export const { setAuth, logoutUser, addSongLibrary, removeSongLibrary, setLibrary } = authSlice.actions;
+export const { setAuth, logoutUser } = authSlice.actions;
 
 export default authSlice.reducer;

@@ -7,16 +7,23 @@ const cx = classNames.bind(styles);
 function ContentItemUser({ data }) {
     const { message, index, mess, date, preDate } = data;
     let element = null;
-    const messageDate = index < message.length - 1 && new Date(message[index + 1]?.createAt).getDate();
-    const messageMonth = index < message.length - 1 && new Date(message[index + 1]?.createAt).getMonth();
-    const messageYear = index < message.length - 1 && new Date(message[index + 1]?.createAt).getFullYear();
-    let nextDate = index < message.length - 1 ? `${messageDate} tháng ${messageMonth}, ${messageYear}` : null;
+    let nextDate = null;
+
+    if (index < message.length - 1) {
+        const messageDate = new Date(message[index + 1].createdAt).getDate();
+        const messageMonth = new Date(message[index + 1].createdAt).getMonth() + 1;
+        const messageYear = new Date(message[index + 1].createdAt).getFullYear();
+        nextDate = `${messageDate} tháng ${messageMonth}, ${messageYear}`;
+    } else {
+        nextDate = null;
+    }
+
     const nextUser = index + 1 < message.length ? message[index + 1].username : null;
     const preUser = index > 0 ? message[index - 1].username : null;
 
-    if (index < message.length - 1 && message[index + 1].username === mess.username && date === nextDate) {
+    if (index < message.length - 1 && nextUser === mess.username && date === nextDate) {
         // no avatar
-        if (nextUser === mess.username && preUser === mess.username) {
+        if (nextUser === mess.username && preUser === mess.username && date === preDate) {
             // many message
             element = (
                 <div className={cx('user-mess')}>
@@ -28,7 +35,10 @@ function ContentItemUser({ data }) {
                     </div>
                 </div>
             );
-        } else if (nextUser === mess.username && preUser !== mess.username) {
+        } else if (
+            (nextUser === mess.username && preUser !== mess.username) ||
+            (nextUser === mess.username && preUser === mess.username && date !== preDate)
+        ) {
             // first message
             element = (
                 <div className={cx('user-mess')}>

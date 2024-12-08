@@ -18,6 +18,9 @@ import { addToast } from '~/slices/toastSlice';
 const cx = classNames.bind(styles);
 function Login() {
     // const width = window.innerWidth > 0 ? window.innerWidth : window.screen.width;
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const toastState = useSelector((state) => state.toast);
 
     const [formValue, setFormValue] = useState({
         username: '',
@@ -130,9 +133,6 @@ function Login() {
         }
     };
 
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const toastState = useSelector((state) => state.toast);
     const login = async (event) => {
         event.preventDefault();
         try {

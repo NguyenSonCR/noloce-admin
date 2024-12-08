@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { logoutUser } from '~/slices/authSlice';
 import { LOCAL_STORAGE_TOKEN_NAME } from '~/api/constants';
+import { socket } from '~/socket';
 
 const cx = classNames.bind(styles);
 
@@ -21,6 +22,7 @@ function Menu({ children, items = [], visible, offset = [], hideOnClick = false 
 
     const handleLogout = () => {
         localStorage.removeItem(LOCAL_STORAGE_TOKEN_NAME);
+        socket.disconnect();
         dispatch(logoutUser());
     };
 

@@ -14,7 +14,7 @@ import images from '~/assets/img';
 
 const cx = classNames.bind(styles);
 function ChatBot() {
-    const userState = useSelector((state) => state.auth);
+    const userState = useSelector((state) => state.user);
     const [toggle, setToggle] = useState(false);
     const [time, setTime] = useState(1);
     const [formShow, setFormShow] = useState('login');
@@ -43,8 +43,6 @@ function ChatBot() {
     useEffect(() => {
         if (userState.user) {
             setFormShow('chat');
-            socket.connect();
-            socket.emit('createAdmin', 'adminRoom');
         }
     }, [userState?.user]);
 
@@ -310,7 +308,6 @@ function ChatBot() {
                                 <Button
                                     primary
                                     onClick={() => {
-                                        socket.connect();
                                         setFormShow('chat');
                                     }}
                                 >

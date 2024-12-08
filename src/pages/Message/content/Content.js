@@ -3,57 +3,38 @@ import styles from './Content.module.scss';
 import images from '~/assets/img';
 import { useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { socket } from '~/socket';
 import { addMessageAdmin } from '~/slices/userSlice';
 import { AiOutlineSend } from 'react-icons/ai';
 import ContentItemUser from '../contentItemUser';
 import ContentItemAdmin from '../contentItemAdmin';
 
 const cx = classNames.bind(styles);
-function Content() {
+function Content({ socket, newMessage }) {
     const userState = useSelector((state) => state.user);
+    const authState = useSelector((state) => state.auth);
     const dispatch = useDispatch();
 
     const [message, setMessage] = useState([]);
+    const [userTyping, setUserTyping] = useState(null);
     useEffect(() => {
-        if (userState.userActive) {
-            setMessage(userState.users.find((user) => user.username === userState.userActive.username).message);
+        if (userState.userActive && userState.users) {
+            const user = userState.users.find((user) => user.username === userState.userActive.username);
+            if (user?.message) setMessage(user.message);
         }
         // eslint-disable-next-line
     }, [userState]);
 
     const [chatMess, setChatMess] = useState('');
     const [focusInput, setFocusInput] = useState(false);
-    const [typingStatus, setTypingStatus] = useState('');
 
     const inputRef = useRef();
 
-    useEffect(() => {
-        socket.on('typingResponse', (data) => setTypingStatus(data));
-        return () => {
-            socket.off('typingResponse', (data) => setTypingStatus(data));
-        };
-        // eslint-disable-next-line
-    }, [socket]);
-
-    useEffect(() => {
-        socket.on('typingBlurResponse', (data) => setTypingStatus(data));
-        return () => {
-            socket.off('typingBlurResponse', (data) => setTypingStatus(data));
-        };
-        // eslint-disable-next-line
-    }, [socket]);
-
-    const handleTypingBlur = () => {
-        socket.emit('typingBlur', '');
-    };
-
-    const handleTyping = (event) => {
-        socket.emit('typing', `${userState.userActive.username} is typing`);
+    const handleEnter = (event) => {
         if (event.key === 'Enter') {
             onSubmit(event);
         }
     };
+    // when submit
 
     const onSubmit = async (event) => {
         event.preventDefault();
@@ -70,11 +51,11 @@ function Content() {
         inputRef.current.innerText = '';
 
         try {
-            await socket.emit('adminChat', {
-                userFrom: 'admin',
-                userTo: userState.userActive.username,
-                content: chatMess,
-                seen: false,
+            await socket.emit('sendMessage', {
+                senderUsername: authState.user.username,
+                recieverUsername: userState.userActive.username,
+                username: userState.userActive.username,
+                message: chatMess,
             });
         } catch (error) {
             console.log(error);
@@ -82,23 +63,15 @@ function Content() {
     };
 
     // typing
-
     const scroll = useRef();
-
-    useEffect(() => {
-        scroll.current.scrollIntoView({
-            behavior: 'smooth',
-            block: 'end',
-        });
-        // eslint-disable-next-line
-    }, [message]);
+    const [notifyNewMessage, setNotifyNewMessage] = useState(null);
 
     useEffect(() => {
         scroll?.current.scrollIntoView({
             behavior: 'smooth',
             block: 'end',
         });
-    }, [typingStatus]);
+    }, [message]);
 
     return (
         <div className={cx('wrapper')}>
@@ -125,18 +98,18 @@ function Content() {
                             message.length > 0 &&
                             message.map((mess, index) => {
                                 // crurrent date
-                                const messageDate = new Date(mess.createAt).getDate();
-                                const messageMonth = new Date(mess.createAt).getMonth();
-                                const messageYear = new Date(mess.createAt).getFullYear();
+                                const messageDate = new Date(mess.createdAt).getDate();
+                                const messageMonth = new Date(mess.createdAt).getMonth() + 1;
+                                const messageYear = new Date(mess.createdAt).getFullYear();
                                 let date = `${messageDate} tháng ${messageMonth}, ${messageYear}`;
                                 let valueDate = date;
                                 // prevous date
                                 const messagePreDate =
-                                    index > 0 ? new Date(message[index - 1].createAt).getDate() : null;
+                                    index > 0 ? new Date(message[index - 1].createdAt).getDate() : null;
                                 const messagePreMonth =
-                                    index > 0 ? new Date(message[index - 1].createAt).getMonth() : null;
+                                    index > 0 ? new Date(message[index - 1].createdAt).getMonth() + 1 : null;
                                 const messagePreYear =
-                                    index > 0 ? new Date(message[index - 1].createAt).getFullYear() : null;
+                                    index > 0 ? new Date(message[index - 1].createdAt).getFullYear() : null;
 
                                 let preDate =
                                     index !== 0
@@ -153,14 +126,14 @@ function Content() {
 
                                 if (mess?.username === 'admin') {
                                     return (
-                                        <div className={cx('message')} key={index}>
+                                        <div className={cx('message-item')} key={index}>
                                             {valueDate && <div className={cx('mess-date')}>{valueDate}</div>}
                                             <ContentItemAdmin data={{ message, index, mess, date, preDate }} />
                                         </div>
                                     );
                                 } else {
                                     return (
-                                        <div className={cx('message')} key={index}>
+                                        <div className={cx('message-item')} key={index}>
                                             {valueDate && <div className={cx('mess-date')}>{valueDate}</div>}
                                             <ContentItemUser data={{ message, index, mess, date, preDate }} />
                                         </div>
@@ -168,23 +141,32 @@ function Content() {
                                 }
                             })}
 
-                        <div className={cx('avatar-notify')}>
-                            <img src={images.avatar} alt="avatar" className={cx('avtar-notify-img')}></img>
-                        </div>
+                        {message.length > 0 &&
+                            message[message.length - 1].username === 'admin' &&
+                            message[message.length - 1].seen && (
+                                <div className={cx('avatar-notify')}>
+                                    <img src={images.avatar} alt="avatar" className={cx('avtar-notify-img')}></img>
+                                </div>
+                            )}
+                        {userTyping && <div className={cx('loader')}></div>}
+                        {/* {notifyNewMessage  */}
+
                         <span ref={scroll}></span>
                     </div>
                 </div>
             </div>
             <div className={cx('input-group')}>
+                {notifyNewMessage && <div className={cx('notify-new-message')}>{1} tin nhắn mới</div>}
                 <div
                     ref={inputRef}
                     spellCheck={false}
-                    onFocus={() => setFocusInput(true)}
+                    onFocus={() => {
+                        setFocusInput(true);
+                    }}
                     onBlur={() => {
-                        handleTypingBlur();
                         setFocusInput(false);
                     }}
-                    onKeyDown={(event) => handleTyping(event)}
+                    onKeyDown={(event) => handleEnter(event)}
                     contentEditable={true}
                     className={cx('chat-input')}
                     onInput={(event) => {

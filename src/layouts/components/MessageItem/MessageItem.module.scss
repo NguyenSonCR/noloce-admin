@@ -21,6 +21,28 @@
     padding: 6px;
 }
 
+.user-online {
+    position: absolute;
+    display: block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: chartreuse;
+    top: 8px;
+    right: 0;
+}
+
+.user-offline {
+    position: absolute;
+    display: block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--border-color);
+    top: 8px;
+    right: 0;
+}
+
 .img {
     width: 100%;
     height: 100%;

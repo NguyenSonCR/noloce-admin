@@ -5,15 +5,48 @@ import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import MessageItem from '~/layouts/components/MessageItem';
 import Content from './content';
 import userApi from '~/api/user/userApi';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { socket } from '~/socket';
-import { setUsers, setUserActive, addMessageServer } from '~/slices/userSlice';
+import { setUsers, setUserActive, addMessageServer, updatedUser } from '~/slices/userSlice';
 
 const cx = classNames.bind(styles);
 function Message() {
     const dispatch = useDispatch();
     const userState = useSelector((state) => state.user);
+    const authState = useSelector((state) => state.auth);
+    const [onlineUsers, setOnlineUsers] = useState([]);
+    const [newMessage, setNewMessage] = useState(false);
+    const [events, setEvents] = useState([]);
+
+    useEffect(() => {
+        socket.connect();
+        socket.emit('addUser', authState.user.username);
+    }, []);
+
+    useEffect(() => {
+        const onGetUsers = (users) => {
+            setEvents(events.concat(users));
+            setOnlineUsers(users);
+        };
+        socket.on('getUsers', onGetUsers);
+        return () => {
+            socket.off('getUsers', onGetUsers);
+        };
+    }, [events]);
+
+    useEffect(() => {
+        const onGetMessage = (newUser) => {
+            setEvents(events.concat(newUser));
+            dispatch(addMessageServer(newUser));
+        };
+        socket.on('getMessage', onGetMessage);
+        return () => {
+            socket.off('getMessage', onGetMessage);
+        };
+
+        // eslint-disable-next-line
+    }, [events]);
 
     // get all chat users
     useEffect(() => {
@@ -29,29 +62,6 @@ function Message() {
             .catch((error) => console.log(error));
         // eslint-disable-next-line
     }, []);
-
-    useEffect(() => {
-        socket.connect();
-        socket.emit('createAdmin', 'adminRoom');
-        return () => socket.off();
-        // eslint-disable-next-line
-    }, []);
-
-    useEffect(() => {
-        socket.on('serverChatMess', (newUser) => {
-            dispatch(addMessageServer(newUser));
-        });
-        return () => {
-            socket.off('serverChatMess');
-        };
-        // eslint-disable-next-line
-    }, [socket]);
-
-    useEffect(() => {
-        socket.on('serverSeenUser', (newUser) => {
-            console.log(newUser);
-        });
-    }, [socket]);
 
     return (
         <div className={cx('wrapper', ['row', 'no-gutters'])}>
@@ -71,13 +81,21 @@ function Message() {
 
                     <div className={cx('content')}>
                         {userState?.users?.map((user, index) => {
-                            return <MessageItem user={user} key={index} />;
+                            return (
+                                <MessageItem
+                                    setNewMessage={setNewMessage}
+                                    socket={socket}
+                                    onlineUsers={onlineUsers}
+                                    user={user}
+                                    key={index}
+                                />
+                            );
                         })}
                     </div>
                 </div>
             </div>
             <div className={cx(['col', 'l-7', 'm-7'], 'col-2')}>
-                <Content />
+                <Content socket={socket} newMessage={newMessage} />
             </div>
         </div>
     );

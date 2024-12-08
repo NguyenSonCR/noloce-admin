@@ -17,7 +17,7 @@ export const userSlice = createSlice({
         },
 
         addMessageAdmin: (state, action) => {
-            state.users = state.users.map((user, index) => {
+            const newUsers = state.users.map((user, index) => {
                 if (user.username === action.payload.userTo) {
                     const date = new Date().toISOString();
                     return {
@@ -28,7 +28,7 @@ export const userSlice = createSlice({
                                 username: action.payload.userFrom,
                                 content: action.payload.content,
                                 seen: false,
-                                createAt: date,
+                                createdAt: date,
                             },
                         ],
                     };
@@ -36,6 +36,8 @@ export const userSlice = createSlice({
                     return user;
                 }
             });
+            const rangeUsers = newUsers.toSorted((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+            state.users = rangeUsers;
         },
 
         addMessageServer: (state, action) => {
@@ -53,30 +55,44 @@ export const userSlice = createSlice({
 
         setSeenAdmin: (state, action) => {
             state.users = state.users.map((user, index) => {
-                if (user.username === action.payload.user.username) {
-                    if (user.message.length > 0) {
-                        return {
-                            ...user,
-                            message: user.message.map((mess, index) => {
-                                if (index === user.message.length - 1) {
-                                    return {
-                                        ...mess,
-                                        seen: true,
-                                    };
-                                } else {
-                                    return mess;
-                                }
-                            }),
-                        };
-                    }
+                if (user.username === action.payload.username && user.message.length > 0) {
+                    const newMessage = user.message.map((mess, index) => {
+                        if (mess.username === action.payload.username) {
+                            return {
+                                username: mess.username,
+                                content: mess.content,
+                                seen: true,
+                                createdAt: mess.createdAt,
+                            };
+                        } else {
+                            return mess;
+                        }
+                    });
+
+                    return {
+                        ...user,
+                        message: newMessage,
+                    };
                 } else {
                     return user;
                 }
             });
         },
+
+        updatedUser: (state, action) => {
+            const newUsers = state.users.map((user, index) => {
+                if (user.username === action.payload.username) {
+                    return action.payload;
+                } else {
+                    return user;
+                }
+            });
+            state.users = newUsers;
+        },
     },
 });
 
-export const { setUsers, setUserActive, addMessageAdmin, addMessageServer, setSeenAdmin } = userSlice.actions;
+export const { setUsers, setUserActive, addMessageAdmin, addMessageServer, setSeenAdmin, updatedUser } =
+    userSlice.actions;
 
 export default userSlice.reducer;
